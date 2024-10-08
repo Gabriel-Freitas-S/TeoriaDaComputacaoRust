@@ -11,7 +11,7 @@ use modulos::ponto::Ponto;
 use modulos::individuo::{gerar_rota, Individuo};
 
 // Importação do itens 'mostrar_populacao' e 'clear_terminal'  do módulo 'utils'.
-use modulos::utils::{clear_terminal, mostrar_populacao};
+use modulos::utils::{clear_terminal, mostrar_populacao,mostrar_matriz_distancias,mostrar_pontos};
 
 // Importação dos itens 'novas_geracoes', 'NUM_PONTOS' e 'TAM_POPULACAO' do módulo 'genetica'.
 use modulos::genetica::{novas_geracoes, NUM_PONTOS, TAM_POPULACAO};
@@ -29,77 +29,51 @@ fn main() {
     // Loop para preencher o vetor de pontos com coordenadas aleatórias.
     for i in 0..NUM_PONTOS {
         pontos.push(Ponto {
-            id: i,
-            px: rng.gen_range(0.0..=360.0),
-            py: rng.gen_range(0.0..=360.0),
+            id: i, // Atribuição de um identificador único ao ponto.
+            px: rng.gen_range(0.0..=360.0), // Geração de uma coordenada x aleatória.
+            py: rng.gen_range(0.0..=360.0), // Geração de uma coordenada y aleatória.
         });
     }
 
-    // Impressão dos pontos gerados.
-    println!("Pontos:");
-    println!("| {:>4} | {:>7} | {:>7} |", "Id", "PX", "PY");
-    println!("|------|---------|---------|");
-
-    // Itera sobre cada ponto no vetor e imprime suas coordenadas.
-    for ponto in &pontos {
-        println!(
-            "| {:>4} | {:>7.2} | {:>7.2} |",
-            ponto.id, ponto.px, ponto.py
-        );
-    }
-
+    // Mostra os pontos gerados na tela.
+    mostrar_pontos(&pontos);
+    
     // Criação de uma matriz para armazenar as distâncias entre cada par de pontos.
     let mut dist = [[0.0; NUM_PONTOS]; NUM_PONTOS];
 
     // Loop duplo para calcular as distâncias euclidianas entre todos os pontos.
     for i in 0..NUM_PONTOS {
         for j in 0..NUM_PONTOS {
-            dist[i][j] = pontos[i].distancia(&pontos[j]);
+            dist[i][j] = pontos[i].distancia(&pontos[j]); // Calcula a distância entre dois pontos.
         }
-    }
-
-    // Impressão da matriz de distâncias euclidianas.
-    println!("\nMatriz de Distâncias Euclidianas:");
-    print!("|      |");
-
-    // Primeira linha da matriz com os IDs dos pontos.
-    for ponto in &pontos {
-        print!(" {:>7} |", ponto.id);
-    }
-    println!();
-
-    // Linhas subsequentes da matriz com as distâncias.
-    for i in 0..NUM_PONTOS {
-        print!("| {:>4} |", pontos[i].id);
-        for j in 0..NUM_PONTOS {
-            print!(" {:>7.2} |", dist[i][j]);
-        }
-        println!();
     }
 
     // Criação de um vetor para armazenar a população de 'Individuo' (rotas).
     let mut populacao: Vec<Individuo> = Vec::with_capacity(TAM_POPULACAO);
 
+    // Mostra a matriz de distâncias calculadas.
+    mostrar_matriz_distancias(&pontos, &dist);
+    
     // Geração inicial das rotas para a população.
     for _ in 0..TAM_POPULACAO {
-        populacao.push(gerar_rota(&pontos, &dist));
+        populacao.push(gerar_rota(&pontos, &dist)); // Gera uma rota e adiciona à população.
     }
 
     // Ordenação da população pelo custo da rota em ordem crescente.
     populacao.sort_by(|a, b| {
         a.custo
             .partial_cmp(&b.custo)
-            .unwrap_or(std::cmp::Ordering::Equal)
+            .unwrap_or(std::cmp::Ordering::Equal) // Compara o custo de duas rotas para ordenação.
     });
 
     // Impressão da população ordenada pelo custo da rota.
-    println!("\nPopulação Ordenada pelo Custo da Rota:");
-    mostrar_populacao(&populacao);
+    println!("\nPopulação Ordenada pelo Custo da Rota:\n");
+    mostrar_populacao(&populacao); // Exibe a população ordenada.
 
     // Evolução da população através de novas gerações.
-    novas_geracoes(&mut populacao, &dist);
+    novas_geracoes(&mut populacao, &dist); // Aplica evolução genética à população.
 
     // Impressão da população final após a evolução.
-    println!("\nPopulação Final Ordenada pelo Custo da Rota:");
-    mostrar_populacao(&populacao);
+    println!("\nPopulação Final Ordenada pelo Custo da Rota:\n");
+    mostrar_populacao(&populacao); // Exibe a população após a evolução.
 }

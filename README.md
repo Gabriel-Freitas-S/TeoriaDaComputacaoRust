@@ -151,6 +151,22 @@ Este projeto implementa um algoritmo genético para resolver o Problema do Caixe
             // ... (código para exibir a população)
         }
         ```
+        
+    *   `mostrar_pontos`: Exibe as coordenadas dos pontos.
+        
+        ```rust
+        pub fn mostrar_pontos(pontos: &[Ponto]) {
+            // ... (código para exibir os pontos)
+        }
+        ```
+        
+    *   `mostrar_matriz_distancias`: Exibe a matriz de distâncias entre os pontos.
+        
+        ```rust
+        pub fn mostrar_matriz_distancias(pontos: &[Ponto], dist: &[[f64; NUM_PONTOS]]) {
+            // ... (código para exibir a matriz de distâncias)
+        }
+        ```
 
 ## Funcionamento do Algoritmo
 
