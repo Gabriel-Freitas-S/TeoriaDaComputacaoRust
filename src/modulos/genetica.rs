@@ -1,4 +1,4 @@
-use crate::modulos::individuo::{Individuo, mutacao}; // Importa o módulo `individuo` e suas funcionalidades.
+use crate::modulos::individuo::{mutacao, Individuo}; // Importa o módulo `individuo` e suas funcionalidades.
 use rand::Rng; // Importa a trait `Rng` da biblioteca `rand` para geração de números aleatórios.
 
 pub(crate) const NUM_PONTOS: usize = 10; // Constante que define o número de pontos (tamanho fixo).
@@ -15,7 +15,8 @@ pub fn roleta(populacao: &Vec<Individuo>, custo_total: f64) -> usize {
     // Itera sobre a população acumulando os custos até o valor aleatório.
     for (i, ind) in populacao.iter().enumerate() {
         soma_custo += ind.custo; // Acumula os custos dos indivíduos.
-        if soma_custo >= aleatorio { // Quando a soma dos custos ultrapassa o valor aleatório...
+        if soma_custo >= aleatorio {
+            // Quando a soma dos custos ultrapassa o valor aleatório...
             return i; // Retorna o índice do indivíduo selecionado.
         }
     }
@@ -39,7 +40,7 @@ pub fn cruzamento(a: &Individuo, b: &Individuo, dist: &[[f64; NUM_PONTOS]]) -> I
         // Verifica se o gene atual na posição `i` difere entre `atual` e `b`.
         if atual.rota[i] != b.rota[i] {
             // Se os genes diferem, itera para explorar trocas potenciais a partir da posição `i+1`.
-            for j in i+1..NUM_PONTOS {
+            for j in i + 1..NUM_PONTOS {
                 // Realiza a troca apenas se o gene na posição `j` de `atual` coincide com o gene na posição `i` de `b`.
                 if atual.rota[j] == b.rota[i] {
                     // Troca os genes nas posições `i` e `j` em `atual`.
@@ -66,29 +67,45 @@ pub fn cruzamento(a: &Individuo, b: &Individuo, dist: &[[f64; NUM_PONTOS]]) -> I
 /// Função `novas_geracoes` que gera novas gerações de indivíduos.
 /// Recebe uma referência mutável à população e a matriz de distâncias.
 pub fn novas_geracoes(populacao: &mut Vec<Individuo>, dist: &[[f64; NUM_PONTOS]]) {
-    for _ in 1..=100 { // Repete o processo de geração de novas populações 100 vezes.
-        let total_custo: f64 = populacao.iter().map(|ind| ind.custo).sum(); // Calcula o custo total da população.
-        let mut nova_populacao = Vec::with_capacity(TAM_POPULACAO); // Cria um vetor vazio para a nova população.
+    // Loop para gerar 100 novas gerações
+    for _ in 1..=100 {
+        // Calcula o custo total da população atual
+        let total_custo: f64 = populacao.iter().map(|ind| ind.custo).sum();
 
-        // Gera 40 novos indivíduos por crossover.
+        // Cria um novo vetor para armazenar a nova geração
+        let mut nova_populacao = Vec::with_capacity(TAM_POPULACAO);
+
+        // Loop para gerar 40 novos indivíduos
         for _ in 0..40 {
-            // Seleciona aleatoriamente dois indivíduos da população original usando roleta.
+            // Seleciona dois pais aleatoriamente usando o método da roleta
             let a_idx = roleta(populacao, total_custo);
             let b_idx = roleta(populacao, total_custo);
 
+            // Obtém os pais da população atual
             let a = &populacao[a_idx];
             let b = &populacao[b_idx];
 
-            // Realiza o crossover e a mutação para gerar um novo indivíduo filho.
+            // Gera um novo indivíduo a partir do cruzamento dos pais
             let mut filho = cruzamento(a, b, dist);
-            mutacao(&mut filho);
-            filho.calcular_custo(dist); // Calcula o custo do filho.
 
-            nova_populacao.push(filho); // Adiciona o filho à nova população.
+            // Aplica mutação ao novo indivíduo
+            mutacao(&mut filho);
+
+            // Calcula o custo do novo indivíduo
+            filho.calcular_custo(dist);
+
+            // Adiciona o novo indivíduo à nova população
+            nova_populacao.push(filho);
         }
 
-        populacao.truncate(60); // Reduz a população original para os 60 melhores indivíduos.
-        populacao.append(&mut nova_populacao); // Adiciona os novos indivíduos à população original.
-        populacao.sort_by(|a, b| a.custo.partial_cmp(&b.custo).unwrap_or(std::cmp::Ordering::Equal)); // Ordena a população pelo custo.
+        // Remove os 40 piores indivíduos da população atual
+        populacao.truncate(60);
+
+        // Adiciona os 40 novos indivíduos à população atual
+        populacao.append(&mut nova_populacao);
+
+        // Ordena a população atual pelo custo, do menor para o maior
+        populacao.sort_by(|a, b| a.custo.partial_cmp(&b.custo).unwrap_or(std::cmp::Ordering::Equal)); 
+
     }
 }
