@@ -194,6 +194,3 @@ Este projeto implementa um algoritmo genético para resolver o Problema do Caixe
 *   O projeto usa o crate `rand` para geração de números aleatórios.
     
 *   A implementação divide tarefas específicas em módulos para organização e manutenção do código.
-
----
-Link do Replit: http://replit.com/@FreitasSouza/TeoriaDaComputacaoRustPublicVersion
